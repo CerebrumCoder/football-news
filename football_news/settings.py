@@ -34,6 +34,9 @@ DEBUG = True
 # Aslinya neal.guarddin menjadi neal-guarddin
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "neal-guarddin-footballnews.pbp.cs.ui.ac.id"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://neal-guarddin-footballnews.pbp.cs.ui.ac.id/"
+]
 
 # Application definition
 
@@ -62,8 +65,12 @@ ROOT_URLCONF = 'football_news.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+
+        # Agar base.html terdeteksi sebagai berkas template
+        'DIRS': [BASE_DIR / 'templates'], 
+        
+        # Ini harus True, agar templates milik app (contohnya main) diprioritaskan daripada admin/base_site.html milik django.contrib.admin
+        'APP_DIRS': True, 
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',

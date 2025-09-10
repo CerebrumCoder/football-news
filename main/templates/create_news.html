@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Create News</h1>
+
+<form method="POST">
+    <!-- {% csrf_token %} adalah token yang berfungsi sebagai security. 
+    Token ini di-generate secara otomatis oleh Django untuk mencegah serangan berbahaya -->
+    {% csrf_token %}
+    <table>
+        <!-- {{ form.as_table }} adalah template tag yang digunakan untuk 
+        menampilkan fields form yang sudah dibuat pada forms.py sebagai table -->
+        {{ form.as_table }}
+        <tr>
+            <td></td>
+            <td>
+                <input type="submit" value="Add NEWS"/>
+            </td>
+        </tr>
+    </table>
+</form>
+
+{% endblock content %}
+
