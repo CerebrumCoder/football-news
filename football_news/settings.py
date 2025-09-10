@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-(#qx-vlo_p#7g5nusgdm=0m_1_k*hnb*yx5q=b)xw(*%iirku(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
-DEBUG = True
+DEBUG = False
 
 # Aslinya neal.guarddin menjadi neal-guarddin
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "neal-guarddin-footballnews.pbp.cs.ui.ac.id"]
