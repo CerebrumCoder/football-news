@@ -1,3 +1,4 @@
+from datetime import time
 from django.test import LiveServerTestCase, TestCase, Client
 from .models import News
 
@@ -149,7 +150,7 @@ class FootballNewsFunctionalTest(LiveServerTestCase):
         self.login_user()
 
         # Go to create news page
-        add_button = self.browser.find_element(By.PARTIAL_LINK_TEXT, "Add News")
+        add_button = WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), '+ Add News')]")))
         add_button.click()
 
         # Fill form
@@ -210,7 +211,7 @@ class FootballNewsFunctionalTest(LiveServerTestCase):
         self.login_user()
 
         # Click logout button - text is inside button, not link
-        logout_button = self.browser.find_element(By.XPATH, "//button[contains(text(), 'Logout')]")
+        logout_button = WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Logout')]")))
         logout_button.click()
 
         # Check if redirected to login page
