@@ -2,7 +2,13 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
+# Untuk menghubungkan model User dengan News
+from django.contrib.auth.models import User
+
 class News(models.Model):
+    # Tambahan untuk menghubungkan dengan model User
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    
     CATEGORY_CHOICES = [
         ('transfer', 'Transfer'),
         ('update', 'Update'),

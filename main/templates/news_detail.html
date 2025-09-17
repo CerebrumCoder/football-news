@@ -15,4 +15,11 @@
 
 <p>{{ news.content }}</p>
 
+<!-- Kode untuk memberi tahu siapa author dari berita tersebut -->
+{% if news.user %}
+    <p>Author: <b>{{ news.user.username }}</b></p>
+{% else %}
+    <p>Author: Anonymous</p>
+{% endif %}
+
 {% endblock content %}

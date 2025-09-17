@@ -16,7 +16,19 @@
     <button>+ Add News</button>
 </a>
 
+<a href="{% url 'main:logout' %}">
+  <button>Logout</button>
+</a>
+<h5>Sesi terakhir login: {{ last_login }}</h5>
 <hr>
+
+<!-- Untuk memunculkan semua artikel atau artikel milik user yang sedang login dengan filter -->
+<a href="?filter=all">
+    <button type="button">All Articles</button>
+</a>
+<a href="?filter=my">
+    <button type="button">My Articles</button>
+</a>
 
 {% if not news_list %}
 <p>Belum ada data berita pada football news.</p>

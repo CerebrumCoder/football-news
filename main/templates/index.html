@@ -1,0 +1,17 @@
+<!-- Perbedaannya adalah pada kode dibawah, kita menggunakan base.html sebagai template utama -->
+{% extends 'base.html' %}
+{% block content %}
+<h1>Football News</h1>
+
+<div>
+    <p id="demo"></p>
+</div>
+
+<script>
+    var text = '{"person": {"name": "Neal Guarddin", "street": "Walet Blok DD No 2", "phone": "081386624036"}}';
+    var obj = JSON.parse(text);
+    document.getElementById("demo").innerHTML = obj.person.name + "<br>" + obj.person.street + "<br>" + obj.person.phone;
+</script>
+<hr>
+
+{% endblock content %}
