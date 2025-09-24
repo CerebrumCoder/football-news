@@ -42,7 +42,7 @@ def show_main(request):
 
     context = {
         'npm' : '2406348282',
-        'name': 'Neal Guarddin',
+        'name': request.user.username,
         'class': 'PBP A',
         'news_list': news_list,
         # Untuk mengakses cookie yang terdaftar di request dengan request.COOKIES.get('last_login', 'Never')
@@ -112,7 +112,7 @@ def login_user(request):
             response = HttpResponseRedirect(reverse("main:show_main"))
             response.set_cookie('last_login', str(datetime.datetime.now()))
             return response
-    
+
     else:
         form = AuthenticationForm(request)
     
@@ -125,6 +125,29 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+# Fungsi untuk edit news pada aplikasi Django
+# Menerima parameter request dan id 
+# Lalu render halaman edit_news.html dengan context yang berisi form
+def edit_news(request, id):
+    news = get_object_or_404(News, pk=id)
+    form = NewsForm(request.POST or None, instance=news)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+    
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'edit_news.html', context)
+
+# Fungsi untuk menghapus news pada aplikasi
+# Menerima parameter request dan id pada views.py untuk menghapus data news.
+def delete_news(request, id):
+    news = get_object_or_404(News, pk=id)
+    news.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 # Untuk mengembalikan Data dalam Bentuk XML
 def show_xml(request):

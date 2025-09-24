@@ -2,9 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" />
+    <meta charset="UTF-8"/>
+    <!-- Viewport untuk menyesuaikan ukuran dan perilaku perangkat mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     {% block meta %} {% endblock meta %}
+    <!-- CDN: Content Delivery Network dari Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
 </head>
 
 <body>
