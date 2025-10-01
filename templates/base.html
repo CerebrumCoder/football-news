@@ -8,10 +8,15 @@
     {% block meta %} {% endblock meta %}
     <!-- CDN: Content Delivery Network dari Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add DOMPurify here -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
 </head>
 
 <body>
     {% block content %} {% endblock content %}
+
+    {% include 'toast.html' %}
+    {% include 'modal.html' %}
 </body>
 </html>

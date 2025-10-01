@@ -1,7 +1,7 @@
 
 # Untuk menggunakan Data Dari Cookies
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 
 # Untuk merestriksi akses halaman Main dan News Detail
@@ -27,6 +27,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from main.forms import NewsForm
 from main.models import News
 # from .models import Person, Post
+
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+# Untuk menutup celah keamanan ini, kita akan melakukan 
+# sanitasi data di sisi backend sebelum menyimpannya ke database. 
+# Django menyediakan fungsi strip_tags yang sangat berguna untuk 
+# menghapus semua tag HTML dari teks.
+from django.utils.html import strip_tags
 
 # Mengaplikasikan decorator login_required untuk fungsi show_main dan show_news, 
 # sehingga halaman utama dan news detail hanya dapat diakses oleh pengguna yang sudah login (terautentikasi).
@@ -158,8 +167,22 @@ def show_xml(request):
 # Untuk mengembalikan Data dalam Bentuk JSON
 def show_json(request):
     news_list = News.objects.all()
-    json_data = serializers.serialize("json", news_list)
-    return HttpResponse(json_data, content_type="application/json")
+    data = [
+        {
+            'id': str(news.id),
+            'title': news.title,
+            'content': news.content,
+            'category': news.category,
+            'thumbnail': news.thumbnail,
+            'news_views': news.news_views,
+            'created_at': news.created_at.isoformat() if news.created_at else None,
+            'is_featured': news.is_featured,
+            'user_id': news.user_id,
+        }
+        for news in news_list
+    ]
+    # Parameter safe=False diperlukan karena data yang dikirim berupa list, bukan dictionary.
+    return JsonResponse(data, safe=False)
 
 # Untuk mengembalikan data berdasarkan ID dalam bentuk XML dan JSON
 
@@ -179,11 +202,22 @@ def show_xml_by_id(request, news_id):
 
 def show_json_by_id(request, news_id):
     try:
-        news_item = News.objects.filter(pk=news_id)
-        json_data = serializers.serialize("json", [news_item])
-        return HttpResponse(json_data, content_type="application/json")
+        news = News.objects.select_related('user').get(pk=news_id)
+        data = {
+            'id': str(news.id),
+            'title': news.title,
+            'content': news.content,
+            'category': news.category,
+            'thumbnail': news.thumbnail,
+            'news_views': news.news_views,
+            'created_at': news.created_at.isoformat() if news.created_at else None,
+            'is_featured': news.is_featured,
+            'user_id': news.user_id,
+            'user_username': news.user.username if news.user_id else None,
+        }
+        return JsonResponse(data)
     except News.DoesNotExist:
-        return HttpResponse(status=404)
+        return JsonResponse({'detail': 'Not found'}, status=404)
 
 
 def show_index(request):
@@ -191,3 +225,46 @@ def show_index(request):
         'nama': 'Neal',
     }
     return render(request, "index.html", context)
+
+# @csrf_exempt: Menonaktifkan CSRF protection untuk request AJAX ini
+# @require_POST: Memastikan hanya HTTP POST yang diterima
+# == 'on': Handling khusus untuk checkbox (mengembalikan 'on' jika dicentang)
+# Return HTTP response dengan status 201 (Created)
+@csrf_exempt
+@require_POST
+def add_news_entry_ajax(request):
+    title = request.POST.get("title")
+    content = request.POST.get("content")
+    category = request.POST.get("category")
+    thumbnail = request.POST.get("thumbnail")
+    is_featured = request.POST.get("is_featured") == 'on'  # checkbox handling
+    user = request.user
+
+    new_news = News(
+        title=title, 
+        content=content,
+        category=category,
+        thumbnail=thumbnail,
+        is_featured=is_featured,
+        user=user
+    )
+    new_news.save()
+
+    return HttpResponse(b"CREATED", status=201)
+
+# Fungsi strip_tags akan menghilangkan semua tag HTML yang terdapat pada data 
+# title dan content yang dikirim pengguna melalui POST request, sehingga data 
+# yang disimpan dalam database adalah data yang sudah "bersih". Misal data = 
+# "<b>Berita</b> <button>Penting</button> <span>Sekali</span>", maka strip_tags(data) 
+# akan mengembalikan Berita Penting Sekali.
+
+# Data lain seperti category, thumbnail, dan is_featured tidak perlu dibersihkan dengan 
+# strip_tags karena tipe datanya sudah memberikan perlindungan yang kuat. Field category 
+# dibatasi oleh choices, thumbnail divalidasi sebagai URL oleh URLField, dan is_featured 
+# hanya menerima nilai boolean dari checkbox. Hal ini mencegah pengguna menyisipkan kode 
+# HTML berbahaya pada field-field tersebut.
+@csrf_exempt
+@require_POST
+def add_news_entry_ajax(request):
+    title = strip_tags(request.POST.get("title")) # strip HTML tags!
+    content = strip_tags(request.POST.get("content")) # strip HTML tags!
